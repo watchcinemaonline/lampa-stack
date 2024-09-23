@@ -17,8 +17,8 @@ function url(){
 }
 
 function ip(){
-    let one = Storage.get('torrserver_url')
-    let two = Storage.get('torrserver_url_two')
+    let one = Storage.get('torrserver_url', '%%TORRSERVER_DOMAIN%%' ? 'https://%%TORRSERVER_DOMAIN%%' : '')
+    let two = Storage.get('torrserver_url_two', '%%TORRSERVER_DOMAIN_TWO%%' ? 'https://%%TORRSERVER_DOMAIN_TWO%%' : '')
 
     return Storage.field('torrserver_use_link') == 'two' ? two || one : one || two
 }

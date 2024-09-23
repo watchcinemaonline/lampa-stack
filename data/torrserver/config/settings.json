@@ -1,5 +1,9 @@
 {
   "BitTorr": {
+    "CacheSize": 205520896,
+    "ConnectionsLimit": 25,
+    "PreloadCache": 18,
+    "ReaderReadAHead": 93,
     "EnableRutorSearch": true
   }
 }

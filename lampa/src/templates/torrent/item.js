@@ -7,7 +7,7 @@ let html = `<div class="torrent-item selector layer--visible layer--render">
 
         
         <div class="torrent-item__bitrate bitrate">#{torrent_item_bitrate}: <span>{bitrate} #{torrent_item_mb}</span></div>
-        <div class="torrent-item__seeds">#{torrent_item_seeds} / #{torrent_item_grabs}: <span>{seeds} / {grabs}</span></div>
+        <div class="torrent-item__seeds">#{torrent_item_seeds}: <span>{seeds} / {grabs}</span></div>
         <!--<div class="torrent-item__grabs">#{torrent_item_grabs}: <span>{grabs}</span></div>-->
         <div class="torrent-item__user_rating">#{torrent_item_user_rating}: <span>{UserRating} </span></div>
         <!--<div class="torrent-item__user_rating">{UserRatingTags} </div>-->

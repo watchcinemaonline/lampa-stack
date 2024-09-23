@@ -151,6 +151,9 @@ function build_web(done){
     copy_timer = setTimeout(()=>{
         const LAMPA_DOMAIN = process.env.LAMPA_DOMAIN || 'example.com';
         const TORRSERVER_DOMAIN = process.env.TORRSERVER_DOMAIN || 'torrserver.example.com';
+        const TORRSERVER_DOMAIN_TWO = process.env.TORRSERVER_DOMAIN_TWO || '';
+        const TORRSERVER_LOGIN = process.env.TORRSERVER_LOGIN || '';
+        const TORRSERVER_PASSWORD = process.env.TORRSERVER_PASSWORD || '';
         const PARSER_TORRENT_TYPE = process.env.PARSER_TORRENT_TYPE || 'torrserver';
         const JACKETT_DOMAIN = process.env.JACKETT_DOMAIN || 'jackett.example.com';
         const JACKETT_APIKEY = process.env.JACKETT_APIKEY || 'jackett';
@@ -158,6 +161,9 @@ function build_web(done){
         src([dstFolder+'app.js'])
             .pipe(replace('%%LAMPA_DOMAIN%%', LAMPA_DOMAIN))
             .pipe(replace('%%TORRSERVER_DOMAIN%%', TORRSERVER_DOMAIN))
+            .pipe(replace('%%TORRSERVER_DOMAIN_TWO%%', TORRSERVER_DOMAIN_TWO))
+            .pipe(replace('%%TORRSERVER_LOGIN%%', TORRSERVER_LOGIN))
+            .pipe(replace('%%TORRSERVER_PASSWORD%%', TORRSERVER_PASSWORD))
             .pipe(replace('%%PARSER_TORRENT_TYPE%%', PARSER_TORRENT_TYPE))
             .pipe(replace('%%JACKETT_DOMAIN%%', JACKETT_DOMAIN))
             .pipe(replace('%%JACKETT_APIKEY%%', JACKETT_APIKEY))

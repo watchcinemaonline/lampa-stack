@@ -223,12 +223,12 @@ function init(){
         'lg_df_year': langname + ' + #{settings_param_torrent_lang_orig} + #{torrent_parser_year}',
     }
 
-    if(Arrays.getKeys(selector).indexOf(Storage.get('parse_lang', 'df')) == -1) Storage.set('parse_lang', 'df')
+    if(Arrays.getKeys(selector).indexOf(Storage.get('parse_lang', 'df')) == -1) Storage.set('parse_lang', 'df_year')
 
     if (!Storage.get('torrserver_url', '')) {
-        Storage.set('torrserver_url', 'https://%%TORRSERVER_DOMAIN%%')
-        Storage.set('torrserver_login', '')
-        Storage.set('torrserver_password', '')
+        Storage.set('torrserver_url', '%%TORRSERVER_DOMAIN%%' ? 'https://%%TORRSERVER_DOMAIN%%' : '');
+        Storage.set('torrserver_login', '%%TORRSERVER_LOGIN%%')
+        Storage.set('torrserver_password', '%%TORRSERVER_PASSWORD%%')
     }
 
     if (!Storage.get('jackett_key', '')) {
