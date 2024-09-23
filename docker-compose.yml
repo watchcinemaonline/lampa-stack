@@ -15,7 +15,6 @@ services:
       - "--entrypoints.unsecure.http.redirections.entryPoint.to=default"
       - "--entrypoints.default.address=:443"
       - "--entrypoints.default.http.tls=true"
-      # - "--certificatesresolvers.default.acme.email=${EMAIL}"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=unsecure"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
@@ -25,6 +24,8 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./data/traefik/letsencrypt:/letsencrypt"
+    networks:
+      - "default"
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.traefikapi.rule=Host(`${LAMPA_DOMAIN}`) && PathPrefix(`/api/`) && HeadersRegexp(`Referer`, `^https?:\/\/.+\/traefik\/dashboard\/`)'
@@ -60,8 +61,8 @@ services:
       context: lampa
       args:
         TORRSERVER_DOMAIN: "${TORRSERVER_DOMAIN}"
-        JACKETT_DOMAIN: "${JACKETT_DOMAIN}"
-        JACKETT_APIKEY: "${JACKETT_APIKEY}"
+        JACKETT_DOMAIN: "${JACKETT_DOMAIN:-}"
+        JACKETT_APIKEY: "${JACKETT_APIKEY:-}"
     restart: always
     logging:
       driver: "json-file"
@@ -71,13 +72,14 @@ services:
       test: /bin/bash -c "</dev/tcp/localhost/80"
       start_period: 60s
       interval: 5s
+    networks:
+      - "default"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.lampa.entrypoints=default"
       - "traefik.http.routers.lampa.rule=Host(`${LAMPA_DOMAIN}`)"
-      - "traefik.http.routers.lampa.tls.certresolver=default"
-      - "traefik.http.services.lampa.loadbalancer.server.port=80"
       - "traefik.http.routers.lampa.middlewares=lampa-cors@docker,gzip@file"
+      - "traefik.http.services.lampa.loadbalancer.server.port=80"
       - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowOriginList=*"
       - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
       - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowHeaders=*"
@@ -108,11 +110,12 @@ services:
       test: /bin/bash -c "</dev/tcp/localhost/80"
       start_period: 60s
       interval: 5s
+    networks:
+      - "default"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.torrserver.entrypoints=default"
       - "traefik.http.routers.torrserver.rule=Host(`${TORRSERVER_DOMAIN}`)"
-      - 'traefik.http.routers.torrserver.tls.certresolver=default'
       - "traefik.http.services.torrserver.loadbalancer.server.port=80"
       - "traefik.http.routers.torrserver.middlewares=torrserver-cors"
       - "traefik.http.middlewares.torrserver-cors.headers.accessControlAllowOriginListRegex=${LAMPA_DOMAIN}|.*\\.${LAMPA_DOMAIN}|localhost"
@@ -142,11 +145,12 @@ services:
       test: /bin/bash -c "</dev/tcp/localhost/9117"
       start_period: 60s
       interval: 5s
+    networks:
+      - "default"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jackett.entrypoints=default"
-      - "traefik.http.routers.jackett.rule=Host(`${JACKETT_DOMAIN}`)"
-      - 'traefik.http.routers.jackett.tls.certresolver=default'
+      - "traefik.http.routers.jackett.rule=Host(`${JACKETT_DOMAIN:-}`)"
       - "traefik.http.routers.jackett.middlewares=jackett-cors@docker,gzip@file"
       - "traefik.http.services.jackett.loadbalancer.server.port=9117"
       - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowOriginListRegex=${LAMPA_DOMAIN}|.*\\.${LAMPA_DOMAIN}|localhost"
@@ -155,3 +159,7 @@ services:
       - "traefik.http.middlewares.jackett-cors.headers.accessControlExposeHeaders=*"
       - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowCredentials=true"
       - "traefik.http.middlewares.jackett-cors.headers.addVaryHeader=true"
+
+networks:
+  default:
+    name: "${NETWORK_NAME:-lampa}"
