@@ -1,0 +1,47 @@
+.player{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 50;
+
+    &.tv{
+        .player-panel__timeline,
+        .player-panel__center,
+        .player-panel__timeline + .player-panel__line,
+        .player-panel__timeline + .player-panel__iptv + .player-panel__line{
+            display: none;
+        }
+        
+        .player-panel__line + .player-panel__line{
+            margin-top: 0;
+        }
+
+        .player-panel__right{
+            margin-left: auto;
+        }
+    }
+
+    &--ios{
+        .player-panel,
+        .player-info__line,
+        .player-info__values,
+        .player-info__error{
+            display: none !important;
+        }
+    }
+}
+
+body.selectbox--open{
+    .player .player-panel,
+    .player .player-info{
+        display: none;
+    }
+}
+body.keyboard-input--visible{
+    .player{
+        display: none;
+    }
+}

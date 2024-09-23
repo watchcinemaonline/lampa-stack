@@ -1,0 +1,6 @@
+.env
+.idea
+.DS_Store
+lampa/node_modules
+lampa/build
+lampa/dest

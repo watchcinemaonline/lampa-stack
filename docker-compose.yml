@@ -1,0 +1,156 @@
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    command:
+      - "--ping=true"
+      - "--log.level=INFO"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.unsecure.address=:80"
+      - "--entrypoints.unsecure.http.redirections.entryPoint.to=default"
+      - "--entrypoints.default.address=:443"
+      - "--entrypoints.default.http.tls=true"
+      # - "--certificatesresolvers.default.acme.email=${EMAIL}"
+      - "--certificatesresolvers.default.acme.httpchallenge=true"
+      - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=unsecure"
+      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
+    networks:
+      - 'torronline'
+    ports:
+      - "${TRAEFIK_BIND_ADDRESS:-0.0.0.0}:${TRAEFIK_BIND_PORT:-80}:80"
+      - "${TRAEFIK_BIND_ADDRESS_HTTPS:-0.0.0.0}:${TRAEFIK_BIND_PORT_HTTPS:-443}:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./data/traefik/letsencrypt:/letsencrypt"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefikapi.rule=Host(`${LAMPA_DOMAIN}`) && PathPrefix(`/api/`) && HeadersRegexp(`Referer`, `^https?:\/\/.+\/traefik\/dashboard\/`)'
+      - 'traefik.http.routers.traefikapi.entrypoints=default'
+      - 'traefik.http.routers.traefikapi.service=api@internal'
+      - 'traefik.http.routers.traefikapi.middlewares=traefik-auth'
+      - 'traefik.http.routers.traefikdashboard.rule=Host(`${LAMPA_DOMAIN}`) && PathPrefix(`/traefik/dashboard/`)'
+      - 'traefik.http.routers.traefikdashboard.priority=500'
+      - 'traefik.http.routers.traefikdashboard.entrypoints=default'
+      - 'traefik.http.routers.traefikdashboard.service=api@internal'
+      - 'traefik.http.routers.traefikdashboard.middlewares=traefik-auth,traefik-stripprefix'
+      - 'traefik.http.middlewares.traefik-stripprefix.stripprefix.prefixes=/traefik'
+      - 'traefik.http.middlewares.traefik-auth.basicauth.users=admin:{SHA}0tTNr469Z7oY3fDRwNoUXE2vTBw='
+    depends_on:
+      lampa:
+        condition: service_started
+      torrserver:
+        condition: service_started
+      jackett:
+        condition: service_started
+    healthcheck:
+      test: traefik healthcheck --ping
+      start_period: 5s
+      interval: 5s
+      retries: 30
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  lampa:
+    container_name: lampa
+    build:
+      context: lampa
+      args:
+        TORRSERVER_DOMAIN: "${TORRSERVER_DOMAIN}"
+        JACKETT_DOMAIN: "${JACKETT_DOMAIN}"
+        JACKETT_APIKEY: "${JACKETT_APIKEY}"
+    restart: always
+    networks:
+      - 'torronline'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lampa.entrypoints=default"
+      - "traefik.http.routers.lampa.rule=Host(`${LAMPA_DOMAIN}`)"
+      - 'traefik.http.routers.lampa.tls.certresolver=default'
+      - "traefik.http.services.lampa.loadbalancer.server.port=80"
+      - "traefik.http.routers.lampa.middlewares=lampa-cors@docker"
+      - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.lampa-cors.headers.accessControlExposeHeaders=*"
+      - "traefik.http.middlewares.lampa-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.lampa-cors.headers.addVaryHeader=true"
+
+  torrserver:
+    container_name: torrserver
+    image: ghcr.io/yourok/torrserver
+    environment:
+      - TS_PORT=80
+      - TS_DONTKILL=1
+      - TS_HTTPAUTH=0
+      - TS_CONF_PATH=/config
+      - TS_TORR_DIR=/torrents
+    volumes:
+      - './data/torrserver/torrents:/torrents'
+      - './data/torrserver/config:/config'
+    #ports:
+    #  - '80:80'
+    restart: always
+    networks:
+      - 'torronline'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.torrserver.entrypoints=default"
+      - "traefik.http.routers.torrserver.rule=Host(`${TORRSERVER_DOMAIN}`)"
+      - 'traefik.http.routers.torrserver.tls.certresolver=default'
+      - "traefik.http.services.torrserver.loadbalancer.server.port=80"
+      - "traefik.http.routers.torrserver.middlewares=torrserver-cors"
+      - "traefik.http.middlewares.torrserver-cors.headers.accessControlAllowOriginListRegex=${LAMPA_DOMAIN}|.*\\.${LAMPA_DOMAIN}|localhost"
+      - "traefik.http.middlewares.torrserver-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.torrserver-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,X-Requested-With,Accept"
+      - "traefik.http.middlewares.torrserver-cors.headers.accessControlExposeHeaders=*"
+      - "traefik.http.middlewares.torrserver-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.torrserver-cors.headers.addVaryHeader=true"
+
+  jackett:
+    container_name: jackett
+    image: lscr.io/linuxserver/jackett:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Tbilisi
+      - AUTO_UPDATE=true
+    volumes:
+      - './data/jackett/config:/config'
+    restart: always
+    networks:
+      - 'torronline'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jackett.entrypoints=default"
+      - "traefik.http.routers.jackett.rule=Host(`${JACKETT_DOMAIN}`)"
+      - 'traefik.http.routers.jackett.tls.certresolver=default'
+      - "traefik.http.routers.jackett.middlewares=jackett-cors@docker"
+      - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+      - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowOriginListRegex=${LAMPA_DOMAIN}|.*\\.${LAMPA_DOMAIN}|localhost"
+      - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,X-Requested-With,Accept"
+      - "traefik.http.middlewares.jackett-cors.headers.accessControlExposeHeaders=*"
+      - "traefik.http.middlewares.jackett-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.jackett-cors.headers.addVaryHeader=true"
+
+networks:
+  torronline:

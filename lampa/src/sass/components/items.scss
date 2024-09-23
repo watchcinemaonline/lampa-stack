@@ -1,0 +1,61 @@
+.items-line{
+    &__head{
+        padding: 0 $offset;
+        margin-bottom: 1.4em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__title{
+        font-size: 1.6em;
+        font-weight: 400;
+
+        .full-person__photo{
+            width: 2em;
+            height: 2em;
+        }
+
+        .full-person__name{
+            font-size: 1em;
+        }
+    }
+
+    &__more{
+        margin-left: 2em;
+        padding: 0.4em 1em;
+        background: rgba(0,0,0,0.33);
+        border-radius: 0.3em;
+
+        &.focus{
+            background-color: #fff;
+            color: #000;
+        }
+    }
+
+    + .items-line{
+        margin-top: 3em;
+    }
+
+    &--type{
+        &-cards{
+            min-height: 24em;
+        }
+        &-collection{
+            min-height: 15em;
+        }
+        &-player-cards{
+            .items-line__head{
+                padding-left: 0.8em;
+            }
+            .items-line__body .scroll__content{
+                padding: 0 1em;
+            }
+        }
+    }
+}
+
+.items-cards{
+    display: flex;
+    align-items: self-start;
+}

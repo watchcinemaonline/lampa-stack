@@ -1,0 +1,73 @@
+.account-modal{
+    text-align: center;
+
+    &__icon{
+        width: 9em;
+        height: 9em;
+        margin: 0 auto;
+        margin-bottom: 2em;
+        border-radius: 100%;
+        background-color: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        > svg{
+            width: 4em;
+            height: 4em;
+        }
+    }
+
+    &__icon-svg{
+        > svg{
+            width: 9.1em;
+            height: 9.1em;
+        }
+        
+        margin-bottom: 2em;
+    }
+
+    &__desc{
+        font-size: 1.2em;
+        line-height: 1.6;
+    }
+
+    &__site{
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 0.3em;
+        padding: 0.2em 0.5em;
+        padding-top: 0em;
+    }
+}
+
+.account-add-device{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    &__site{
+        background: rgba(0,0,0,0.3);
+        display: inline-block;
+        padding: 0.1em 0.4em;
+        border-radius: 0.4em;
+        color: #D8C39A;
+    }
+
+    .about{
+        margin-bottom: 2em;
+    }
+
+    .simple-button{
+        margin: 0;
+    }
+
+    .account-add-device__qr{
+        width: 12em;
+        height: 12em;
+        border-radius: 1em;
+        padding: 0.6em;
+        background: #fff;
+        margin-bottom: 1.8em;
+    }
+}

@@ -1,0 +1,160 @@
+.head{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 15;
+    
+    &__body{
+        padding: 0.5em $offset;
+        display: flex;
+        align-items: center;
+    }
+
+    &__logo-icon{
+        width: 2.7em;
+        flex-shrink: 0;
+        margin-right: 1em;
+    }
+
+    &__menu-icon{
+        flex-shrink: 0;
+        margin-right: 1em;
+        display: none;
+
+        svg{
+            width: 2.1em;
+            height: 2.1em;
+        } 
+    }
+
+    &__split{
+        background: url(../img/icons/split.svg) no-repeat 50% 50%;
+        background-size: contain;
+        width: 1em;
+        height: 1.3em;
+        margin: 0 1em;
+        opacity: 0.5;
+    }
+
+    &__actions{
+        display: flex;
+
+        @media screen and (max-width: $media_md) {
+            + .head__split{
+                display: none;
+            }
+        }
+    }
+
+    &__title{
+        font-size: 1.7em;
+        font-weight: 300;
+        margin-right: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+    }
+
+    &__action{
+        width: 2.8em;
+        height: 2.8em;
+        border-radius: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6em;
+        margin-left: 1.5em;
+        flex-shrink: 0;
+
+
+        &.focus,
+        &.hover{
+            background-color: #fff;
+            color: #000;
+        }
+
+        &.active{
+            position: relative;
+
+            &::after{
+                content: '';
+                display: block;
+                width: 0.5em;
+                height: 0.5em;
+                position: absolute;
+                top: 0;
+                right: 0;
+                background-color: #EA4E4E;
+                border: 0.15em solid #fff;
+                border-radius: 100%;
+            }
+        }
+
+        &.open--profile{
+            padding: 0.2em;
+
+            img{
+                border-radius: 100%;
+                width: 2.4em;
+                height: 2.4em;
+            }
+        }
+
+        @media screen and (max-width: $media_xm) {
+            margin-left: 0.5em;
+        }
+    }
+
+    &__time{
+        display: flex;
+        white-space: nowrap;
+        margin-top: -0.2em;
+
+        &-now{
+            font-weight: 600;
+            font-size: 2em;
+            line-height: 0.9;
+            margin-right: 0.5em;
+        }
+
+        &-date{
+            font-size: 0.9em;
+            line-height: 1;
+        }
+        &-week{
+            font-size: 0.9em;
+            line-height: 1;
+        }
+
+        @media screen and (max-width: $media_md) {
+            display: none;
+        }
+    }
+}
+
+body.true--mobile{
+    .head__logo-icon,
+    .head__action.open--search,
+    .head__action.open--settings{
+        display: none;
+    }
+    .head__menu-icon{
+        display: block;
+        margin-left: 0.3em;
+        margin-right: 1.2em;
+    }
+
+    .head__action{
+        margin-left: 1em;
+        height: 3em;
+        width: 3em;
+    }
+
+    &.orientation--landscape{
+        .head .head__body{
+            padding-right: 10em;
+        }
+    }
+}
