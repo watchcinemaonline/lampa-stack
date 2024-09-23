@@ -10,12 +10,15 @@ Source env variables
 source .env
 ```
 
-Build docker images
+Build and start docker containers with selected **torrserver** parser
 ```bash
+export COMPOSE_PROFILES=standalone
 docker compose build
+docker compose up -d
 ```
-
-Start docker containers
+Start docker containers with **jackett** parser and container
 ```bash
-docker compose --profile standalone up -d
+export COMPOSE_PROFILES=standalone,jackett
+docker compose build
+docker compose up -d
 ```
