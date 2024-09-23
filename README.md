@@ -1,4 +1,4 @@
-# Torrentino
+# Lampa Docker Stack
 
 Copy example env file and update by your values
 ```bash
