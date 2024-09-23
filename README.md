@@ -2,7 +2,7 @@
 
 Copy example env file and update by your values
 ```bash
-cp .env.jackett.dist .env
+cp .env.torrserver.dist .env
 ```
 
 Source env variables
