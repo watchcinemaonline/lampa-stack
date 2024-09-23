@@ -437,7 +437,7 @@ function startApp(){
 
     /** Чтоб не писали по 100 раз */
 
-    Storage.set('parser_torrent_type', Storage.get('parser_torrent_type') || 'jackett')
+    Storage.set('parser_torrent_type', Storage.get('parser_torrent_type') || '%%PARSER_TORRENT_TYPE%%')
 
     /** Инфа */
 
